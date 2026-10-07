@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureRole::class,
             'password.change' => RequirePasswordChange::class,
         ]);
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
