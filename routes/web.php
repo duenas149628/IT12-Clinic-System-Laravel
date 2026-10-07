@@ -8,6 +8,13 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\VisitRecordController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+
+Route::get('/health', function () {
+    DB::select('select 1');
+    return response('ok');
+});
+
 
 Route::get('/', [AuthController::class, 'home']);
 
