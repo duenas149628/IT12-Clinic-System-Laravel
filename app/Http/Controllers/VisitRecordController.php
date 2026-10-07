@@ -15,28 +15,32 @@ class VisitRecordController extends Controller
 {
     public function patientIndex(Request $request): View
     {
+        $visitsRows = $this->rowLimit($request, 'visits_rows');
         $patient = Auth::user()->patient()->firstOrFail();
         $date = (string) $request->query('visit_date', '');
         if (! $this->validDate($date)) {
             $date = '';
         }
 
-        $visits = $patient->visitRecords()
+        $query = $patient->visitRecords()
             ->when($date !== '', fn ($query) => $query->whereDate('visit_date', $date))
-            ->orderByDesc('visit_date')->orderByDesc('visit_id')->get();
+            ->orderByDesc('visit_date')->orderByDesc('visit_id');
+        $visitsTotal = (clone $query)->count();
+        $visits = $query->limit($visitsRows)->get();
 
-        return view('patient.visits', compact('patient', 'visits', 'date'));
+        return view('patient.visits', compact('patient', 'visits', 'visitsTotal', 'visitsRows', 'date'));
     }
 
     public function staffIndex(Request $request): View
     {
+        $visitsRows = $this->rowLimit($request, 'visits_rows');
         $search = mb_substr(trim((string) $request->query('search', '')), 0, 100);
         $date = (string) $request->query('visit_date', '');
         if (! $this->validDate($date)) {
             $date = '';
         }
 
-        $visits = VisitRecord::with('patient')
+        $query = VisitRecord::with('patient')
             ->when($date !== '', fn ($query) => $query->whereDate('visit_date', $date))
             ->when($search !== '', function ($query) use ($search): void {
                 $needle = '%'.addcslashes($search, '%_\\').'%';
@@ -49,10 +53,11 @@ class VisitRecordController extends Controller
                         ->orWhere('treatment', 'like', $needle);
                 });
             })
-            ->orderByDesc('visit_date')->orderByDesc('visit_id')
-            ->paginate(15)->withQueryString();
+            ->orderByDesc('visit_date')->orderByDesc('visit_id');
+        $visitsTotal = (clone $query)->count();
+        $visits = $query->limit($visitsRows)->get();
 
-        return view('staff.visits', compact('visits', 'search', 'date'));
+        return view('staff.visits', compact('visits', 'visitsTotal', 'visitsRows', 'search', 'date'));
     }
 
     public function createForm(Request $request): View|RedirectResponse
@@ -110,6 +115,7 @@ class VisitRecordController extends Controller
 
     public function update(Request $request, VisitRecord $visit): RedirectResponse
     {
+        $request->merge(['appointment_id' => $visit->appointment_id]);
         $data = $this->validatedVisit($request);
         unset($data['appointment_id']);
 
@@ -141,5 +147,12 @@ class VisitRecordController extends Controller
     {
         return preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) === 1
             && \DateTimeImmutable::createFromFormat('!Y-m-d', $date)?->format('Y-m-d') === $date;
+    }
+
+    private function rowLimit(Request $request, string $key): int
+    {
+        $rows = filter_var($request->query($key, 5), FILTER_VALIDATE_INT);
+
+        return min(500, max(5, is_int($rows) ? (int) (ceil($rows / 5) * 5) : 5));
     }
 }

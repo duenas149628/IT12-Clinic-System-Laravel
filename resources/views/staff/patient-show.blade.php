@@ -1,1 +1,62 @@
-@extends('layouts.app') @section('title','Patient record') @section('content')<div class="d-flex justify-content-between mb-3"><div><h1 class="h2 text-brand">{{ $patient->first_name }} {{ $patient->last_name }}</h1><p class="text-secondary mb-0">{{ $patient->patient_number }} · {{ $patient->user?->email }}</p></div><a class="btn btn-outline-primary align-self-start" href="{{ route('staff.patients.edit',$patient) }}">Edit patient</a></div><div class="card p-4 mb-4"><div class="row g-3">@foreach(['Birth date'=>$patient->birth_date?->format('F j, Y')??'—','Sex'=>$patient->sex??'—','Contact'=>$patient->contact_number??'—','Address'=>$patient->address??'—'] as $label=>$value)<div class="col-md-6"><div class="small text-secondary">{{ $label }}</div><div>{{ $value }}</div></div>@endforeach</div></div><div class="card mb-4"><div class="card-header"><h2 class="h5 mb-0">Appointments</h2></div><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Date</th><th>Reason</th><th>Status</th><th></th></tr></thead><tbody>@forelse($patient->appointments as $a)<tr><td>{{ $a->confirmed_date?->format('M j, Y')??$a->preferred_date?->format('M j, Y') }}</td><td>{{ $a->reason }}</td><td><span class="badge badge-{{ $a->status }}">{{ ucfirst(str_replace('_',' ',$a->status)) }}</span></td><td><a href="{{ route('staff.appointments.show',$a) }}">View</a></td></tr>@empty<tr><td colspan="4" class="p-3 text-secondary">No appointments.</td></tr>@endforelse</tbody></table></div></div><div class="card"><div class="card-header"><h2 class="h5 mb-0">Visit records</h2></div><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Date</th><th>Complaint</th><th></th></tr></thead><tbody>@forelse($patient->visitRecords as $v)<tr><td>{{ $v->visit_date?->format('M j, Y') }}</td><td>{{ $v->chief_complaint }}</td><td><a href="{{ route('staff.visits.show',$v) }}">View</a></td></tr>@empty<tr><td colspan="3" class="p-3 text-secondary">No visit records.</td></tr>@endforelse</tbody></table></div></div>@endsection
+@extends('layouts.app')
+
+@section('title', 'Patient record')
+
+@section('content')
+    <div class="d-flex justify-content-between mb-3">
+        <div>
+            <h1 class="h2 text-brand">{{ $patient->first_name }} {{ $patient->last_name }}</h1>
+            <p class="text-secondary mb-0">{{ $patient->patient_number }} · {{ $patient->user?->email }}</p>
+        </div>
+        <a class="header-action-btn align-self-start" href="{{ route('staff.patients.edit', $patient) }}"><i class="bi bi-pencil-square" aria-hidden="true"></i>Edit patient</a>
+    </div>
+
+    <div class="card p-4 mb-4">
+        <div class="row g-3">
+            @foreach(['Birth date' => $patient->birth_date?->format('F j, Y') ?? '—', 'Sex' => $patient->sex ?? '—', 'Contact' => $patient->contact_number ?? '—', 'Address' => $patient->address ?? '—'] as $label => $value)
+                <div class="col-md-6"><div class="small text-secondary">{{ $label }}</div><div>{{ $value }}</div></div>
+            @endforeach
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><h2 class="h5 mb-0">Appointments</h2></div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead><tr><th>Date</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                    @forelse($patient->appointments as $a)
+                        <tr>
+                            <td>{{ $a->confirmed_date?->format('M j, Y') ?? $a->preferred_date?->format('M j, Y') }}</td>
+                            <td>{{ $a->reason }}</td>
+                            <td><span class="badge badge-{{ $a->status }}">{{ ucfirst(str_replace('_', ' ', $a->status)) }}</span></td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="{{ route('staff.appointments.show', $a) }}">View</a></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" class="p-3 text-secondary">No appointments.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2 class="h5 mb-0">Visit records</h2></div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead><tr><th>Date</th><th>Complaint</th><th></th></tr></thead>
+                <tbody>
+                    @forelse($patient->visitRecords as $v)
+                        <tr>
+                            <td>{{ $v->visit_date?->format('M j, Y') }}</td>
+                            <td>{{ $v->chief_complaint }}</td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="{{ route('staff.visits.show', $v) }}">View</a></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="p-3 text-secondary">No visit records.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endsection

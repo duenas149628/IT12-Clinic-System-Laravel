@@ -10,10 +10,10 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request): View
     {
+        $activityRows = $this->rowLimit($request, 'activity_rows');
         $from = (string) $request->query('from_date', '');
         $to = (string) $request->query('to_date', '');
         $event = mb_substr(trim((string) $request->query('event', '')), 0, 100);
-        $userId = trim((string) $request->query('user_id', ''));
         $search = mb_substr(trim((string) $request->query('search', '')), 0, 150);
         $filterError = '';
 
@@ -23,10 +23,6 @@ class ActivityLogController extends Controller
             $filterError = 'Choose valid dates, with the start date on or before the end date.';
             $from = $to = '';
         }
-        if ($userId !== '' && ! ctype_digit($userId)) {
-            $userId = '';
-        }
-
         $path = storage_path('app/private/activity.jsonl');
         $entries = [];
         if (is_file($path) && is_readable($path)) {
@@ -42,7 +38,7 @@ class ActivityLogController extends Controller
         $events = collect($entries)->pluck('event')->filter()->unique()
             ->mapWithKeys(fn (string $key): array => [$key => $this->eventLabel($key)])
             ->sort()->all();
-        $entries = collect($entries)->filter(function (array $entry) use ($from, $to, $event, $userId, $search): bool {
+        $entries = collect($entries)->filter(function (array $entry) use ($from, $to, $event, $search): bool {
             $timestamp = (string) ($entry['time_utc'] ?? '');
             $day = substr($timestamp, 0, 10);
             if (($from !== '' && ($day < $from || ! $this->validDate($day)))
@@ -50,9 +46,6 @@ class ActivityLogController extends Controller
                 return false;
             }
             if ($event !== '' && ($entry['event'] ?? '') !== $event) {
-                return false;
-            }
-            if ($userId !== '' && (string) ($entry['user_id'] ?? '') !== $userId) {
                 return false;
             }
             if ($search !== '') {
@@ -66,6 +59,7 @@ class ActivityLogController extends Controller
             return true;
         })->values();
 
+        $activityTotal = $entries->count();
         $userIds = $entries->pluck('user_id')->filter(fn ($id): bool => is_numeric($id))->unique()->values();
         $userNames = $userIds->isEmpty()
             ? collect()
@@ -82,7 +76,16 @@ class ActivityLogController extends Controller
             return $entry;
         });
 
-        return view('staff.activity-log', compact('entries', 'events', 'from', 'to', 'event', 'userId', 'search', 'filterError'));
+        $entries = $entries->take($activityRows);
+
+        return view('staff.activity-log', compact('entries', 'activityTotal', 'activityRows', 'events', 'from', 'to', 'event', 'search', 'filterError'));
+    }
+
+    private function rowLimit(Request $request, string $key): int
+    {
+        $rows = filter_var($request->query($key, 5), FILTER_VALIDATE_INT);
+
+        return min(500, max(5, is_int($rows) ? (int) (ceil($rows / 5) * 5) : 5));
     }
 
     private function eventLabel(string $event): string

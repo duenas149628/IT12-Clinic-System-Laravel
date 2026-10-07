@@ -45,7 +45,7 @@
     <section class="card dashboard-lists overflow-hidden">
         <div class="card-header d-flex justify-content-between align-items-center py-3 px-4">
             <h2 class="h5 mb-0">Upcoming Confirmed Appointments</h2>
-            <a class="small text-brand fw-semibold" href="{{ route('patient.appointments') }}">View all</a>
+            <a class="btn btn-sm btn-outline-primary" href="{{ route('patient.appointments') }}">View all</a>
         </div>
         <div class="table-responsive">
             <table class="table align-middle mb-0">

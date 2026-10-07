@@ -39,6 +39,7 @@ class StaffController extends Controller
 
     public function patients(Request $request): View
     {
+        $patientsRows = $this->rowLimit($request, 'patients_rows');
         $search = mb_substr(trim((string) $request->query('search', '')), 0, 100);
         $query = Patient::query()->with('user')
             ->when($search !== '', function ($query) use ($search): void {
@@ -53,7 +54,10 @@ class StaffController extends Controller
             })
             ->orderBy('last_name')->orderBy('first_name');
 
-        return view('staff.patients', ['patients' => $query->paginate(15)->withQueryString(), 'search' => $search]);
+        $patientsTotal = (clone $query)->count();
+        $patients = $query->limit($patientsRows)->get();
+
+        return view('staff.patients', compact('patients', 'patientsTotal', 'patientsRows', 'search'));
     }
 
     public function patientCreateForm(): View
@@ -164,6 +168,8 @@ class StaffController extends Controller
 
     public function reports(Request $request): View
     {
+        $reportAppointmentsRows = $this->rowLimit($request, 'report_appointments_rows');
+        $reportVisitsRows = $this->rowLimit($request, 'report_visits_rows');
         $startDefault = now()->startOfMonth()->toDateString();
         $endDefault = today()->toDateString();
         $start = (string) $request->query('start_date', $startDefault);
@@ -177,23 +183,39 @@ class StaffController extends Controller
         $statusCounts = [];
         $appointments = collect();
         $visits = collect();
+        $appointmentsTotal = 0;
+        $visitsTotal = 0;
         if ($valid) {
             $statusCounts = Appointment::query()
                 ->selectRaw('status, COUNT(*) as total')
                 ->whereRaw('COALESCE(confirmed_date, preferred_date) BETWEEN ? AND ?', [$start, $end])
                 ->groupBy('status')->pluck('total', 'status')->all();
 
-            $appointments = Appointment::with('patient')
+            $appointmentsQuery = Appointment::with('patient')
                 ->whereRaw('COALESCE(confirmed_date, preferred_date) BETWEEN ? AND ?', [$start, $end])
                 ->orderByRaw('COALESCE(confirmed_date, preferred_date) DESC')
-                ->orderByDesc('appointment_id')->get();
+                ->orderByDesc('appointment_id');
+            $appointmentsTotal = (clone $appointmentsQuery)->count();
+            $appointments = $appointmentsQuery->limit($reportAppointmentsRows)->get();
 
-            $visits = VisitRecord::with('patient')
+            $visitsQuery = VisitRecord::with('patient')
                 ->whereBetween('visit_date', [$start, $end])
-                ->orderByDesc('visit_date')->orderByDesc('visit_id')->get();
+                ->orderByDesc('visit_date')->orderByDesc('visit_id');
+            $visitsTotal = (clone $visitsQuery)->count();
+            $visits = $visitsQuery->limit($reportVisitsRows)->get();
         }
 
-        return view('staff.reports', compact('start', 'end', 'valid', 'statusCounts', 'appointments', 'visits'));
+        return view('staff.reports', compact(
+            'start', 'end', 'valid', 'statusCounts', 'appointments', 'visits',
+            'appointmentsTotal', 'visitsTotal', 'reportAppointmentsRows', 'reportVisitsRows'
+        ));
+    }
+
+    private function rowLimit(Request $request, string $key): int
+    {
+        $rows = filter_var($request->query($key, 5), FILTER_VALIDATE_INT);
+
+        return min(500, max(5, is_int($rows) ? (int) (ceil($rows / 5) * 5) : 5));
     }
 
     private function validDate(string $date): bool

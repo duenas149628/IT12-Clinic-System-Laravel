@@ -35,8 +35,8 @@ class AppointmentController extends Controller
         $patient = Auth::user()->patient()->firstOrFail();
         $data = $request->validate([
             'preferred_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'preferred_start_time' => ['required', 'date_format:H:i'],
-            'preferred_end_time' => ['required', 'date_format:H:i', 'after:preferred_start_time'],
+            'preferred_start_time' => ['required', 'date_format:H:i', 'after_or_equal:09:00', 'before_or_equal:20:00'],
+            'preferred_end_time' => ['required', 'date_format:H:i', 'after:preferred_start_time', 'before_or_equal:20:00'],
             'reason' => ['required', 'string', 'max:255'],
         ]);
 
@@ -55,24 +55,27 @@ class AppointmentController extends Controller
 
     public function patientIndex(Request $request): View
     {
+        $appointmentsRows = $this->rowLimit($request, 'appointments_rows');
         $patient = Auth::user()->patient()->firstOrFail();
         $statusOptions = self::STATUSES;
         $status = in_array($request->query('status'), $statusOptions, true) ? $request->query('status') : 'all';
         $date = $this->validDate($request->query('date')) ? $request->query('date') : '';
 
-        $appointments = $patient->appointments()
+        $query = $patient->appointments()
             ->when($status !== 'all', fn ($query) => $query->where('status', $status))
             ->when($date !== '', fn ($query) => $query->whereRaw('COALESCE(confirmed_date, preferred_date) = ?', [$date]))
             ->orderByRaw("CASE status WHEN 'pending' THEN 1 WHEN 'confirmed' THEN 2 WHEN 'completed' THEN 3 WHEN 'cancelled' THEN 4 ELSE 5 END")
             ->orderByRaw('COALESCE(confirmed_date, preferred_date) DESC')
-            ->orderByDesc('appointment_id')
-            ->get();
+            ->orderByDesc('appointment_id');
+        $appointmentsTotal = (clone $query)->count();
+        $appointments = $query->limit($appointmentsRows)->get();
 
-        return view('patient.appointments', compact('patient', 'appointments', 'status', 'date', 'statusOptions'));
+        return view('patient.appointments', compact('patient', 'appointments', 'appointmentsTotal', 'appointmentsRows', 'status', 'date', 'statusOptions'));
     }
 
     public function staffIndex(Request $request): View
     {
+        $appointmentsRows = $this->rowLimit($request, 'appointments_rows');
         $statusOptions = self::STATUSES;
         $status = in_array($request->query('status'), $statusOptions, true) ? $request->query('status') : 'all';
         $date = $this->validDate($request->query('date')) ? $request->query('date') : '';
@@ -100,7 +103,8 @@ class AppointmentController extends Controller
             });
         }
 
-        $appointments = $query->orderByDesc('created_at')->orderByDesc('appointment_id')->get();
+        $appointmentsTotal = (clone $query)->count();
+        $appointments = $query->orderByDesc('created_at')->orderByDesc('appointment_id')->limit($appointmentsRows)->get();
         $pendingCount = Appointment::where('status', 'pending')->count();
         $todayCount = Appointment::where('status', 'confirmed')->whereDate('confirmed_date', today())->count();
 
@@ -150,10 +154,17 @@ class AppointmentController extends Controller
         $calendarDays = collect(range(0, 41))->map(fn (int $offset) => $gridStart->addDays($offset));
 
         return view('staff.appointments', compact(
-            'appointments', 'pendingCount', 'todayCount', 'statusOptions', 'status', 'date',
+            'appointments', 'appointmentsTotal', 'appointmentsRows', 'pendingCount', 'todayCount', 'statusOptions', 'status', 'date',
             'search', 'todayView', 'calendarMonth', 'calendarDays', 'confirmedDays',
             'pendingDays', 'selectedDate', 'dayAppointments'
         ));
+    }
+
+    private function rowLimit(Request $request, string $key): int
+    {
+        $rows = filter_var($request->query($key, 5), FILTER_VALIDATE_INT);
+
+        return min(500, max(5, is_int($rows) ? (int) (ceil($rows / 5) * 5) : 5));
     }
 
     public function staffCreateForm(Request $request): View

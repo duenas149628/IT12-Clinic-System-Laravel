@@ -39,11 +39,102 @@
         .navbar .account-actions .btn-outline-secondary:hover { color: var(--teal-deep); background: #fff; border-color: #fff; }
         .navbar .account-actions .btn-primary { color: var(--teal-deep); background: #fff; border-color: #fff; }
         .navbar .account-actions .btn-primary:hover { color: var(--teal-dark); background: #e8f8fa; border-color: #e8f8fa; }
-        .btn-primary { --bs-btn-bg: var(--teal); --bs-btn-border-color: var(--teal); --bs-btn-hover-bg: #096d7d; --bs-btn-hover-border-color: #096d7d; --bs-btn-active-bg: var(--teal-dark); }
-        .btn-outline-primary { --bs-btn-color: var(--teal); --bs-btn-border-color: #89bac2; --bs-btn-hover-bg: var(--teal); --bs-btn-hover-border-color: var(--teal); }
+        .btn {
+            --bs-btn-border-radius: .65rem;
+            --bs-btn-font-weight: 600;
+            --bs-btn-focus-box-shadow: 0 0 0 .2rem rgba(17,127,145,.22);
+            transition: color .16s ease, background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+        }
+        .btn:hover:not(:disabled):not(.disabled) { transform: translateY(-1px); }
+        .btn-primary, .btn-success {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: var(--teal);
+            --bs-btn-border-color: var(--teal);
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #096d7d;
+            --bs-btn-hover-border-color: #096d7d;
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: var(--teal-dark);
+            --bs-btn-active-border-color: var(--teal-dark);
+            --bs-btn-disabled-bg: #8bbbc2;
+            --bs-btn-disabled-border-color: #8bbbc2;
+        }
+        .btn-outline-primary, .btn-outline-secondary, .btn-outline-success {
+            --bs-btn-color: var(--teal-deep);
+            --bs-btn-border-color: #89bac2;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: var(--teal);
+            --bs-btn-hover-border-color: var(--teal);
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: var(--teal-dark);
+            --bs-btn-active-border-color: var(--teal-dark);
+            --bs-btn-disabled-color: #71858b;
+            --bs-btn-disabled-border-color: #c8dadd;
+        }
+        .btn-danger, .btn-outline-danger {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #a83d46;
+            --bs-btn-border-color: #a83d46;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #8f3039;
+            --bs-btn-hover-border-color: #8f3039;
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: #77262e;
+            --bs-btn-active-border-color: #77262e;
+        }
+        .btn-outline-danger {
+            --bs-btn-color: #963741;
+            --bs-btn-bg: transparent;
+            --bs-btn-border-color: #d5a1a6;
+            --bs-btn-hover-color: #fff;
+        }
+        .btn-warning {
+            --bs-btn-color: #4c3a00;
+            --bs-btn-bg: #f0d77d;
+            --bs-btn-border-color: #d4b54f;
+            --bs-btn-hover-color: #3f3100;
+            --bs-btn-hover-bg: #e6ca62;
+            --bs-btn-hover-border-color: #c9a934;
+        }
+        .btn-secondary {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: var(--teal-deep);
+            --bs-btn-border-color: var(--teal-deep);
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: var(--teal-dark);
+            --bs-btn-hover-border-color: var(--teal-dark);
+        }
+        .staff-workspace-page main .btn-outline-secondary.align-self-start,
+        .staff-workspace-page main .btn-primary.align-self-start,
+        .staff-workspace-page main > .d-flex.flex-wrap.gap-2 .btn-outline-primary {
+            --bs-btn-color: var(--teal-deep);
+            --bs-btn-bg: #fff;
+            --bs-btn-border-color: rgba(255,255,255,.9);
+            --bs-btn-hover-color: var(--teal-dark);
+            --bs-btn-hover-bg: #e8f8fa;
+            --bs-btn-hover-border-color: #e8f8fa;
+        }
+        .staff-workspace-page main .btn-outline-danger {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #a83d46;
+            --bs-btn-border-color: #a83d46;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #8f3039;
+            --bs-btn-hover-border-color: #8f3039;
+        }
+        .header-action-btn, .request-appointment-btn, .quick-action {
+            border-radius: .65rem;
+            transition: color .16s ease, background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+        }
+        .header-action-btn:hover, .request-appointment-btn:hover, .quick-action:hover { transform: translateY(-1px); }
+        .header-action-btn:focus-visible, .request-appointment-btn:focus-visible, .quick-action:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 .2rem rgba(255,255,255,.55), 0 0 0 .4rem rgba(17,127,145,.5);
+        }
         .text-brand { color: var(--teal)!important; }
         .page-wrap { max-width: 1240px; }
-        .card { border: 1px solid #e5edef; box-shadow: 0 8px 24px rgba(22,61,70,.07); border-radius: 1.25rem; }
+        .card { overflow: hidden; border: 1px solid #e5edef; box-shadow: 0 8px 24px rgba(22,61,70,.07); border-radius: 1.25rem; }
+        .page-wrap .card .card { border: 0; box-shadow: none; background: transparent; border-radius: 0; }
         .card-header { background: #fff; border-bottom-color: #e7eff0; }
         .stat-card { border-left: 4px solid var(--teal); height: 100%; }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--teal); }
@@ -77,7 +168,9 @@
         .staff-workspace-page main > p,
         .patient-workspace-page main > .d-flex p,
         .patient-workspace-page main > p { color: rgba(255,255,255,.9)!important; }
+        .staff-workspace-page main > .row h1,
         .patient-workspace-page main > .row h1 { color: #fff!important; }
+        .staff-workspace-page main > .row > div > p,
         .patient-workspace-page main > .row > div > p { color: rgba(255,255,255,.94)!important; }
         .staff-dashboard-page main { max-width: 1160px; padding-top: 2.35rem!important; }
         .staff-dashboard-page main > .d-flex:first-child .text-brand { color: #d8fbff!important; }
@@ -93,8 +186,8 @@
         .staff-workspace-page .header-action-btn:hover { color: var(--teal-dark); background: #eaf9fb; border-color: #eaf9fb; }
         .patient-workspace-page .request-appointment-btn { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .6rem 1rem; border: 2px solid rgba(255,255,255,.95); border-radius: .65rem; color: var(--teal-deep)!important; background: #fff; box-shadow: 0 4px 14px rgba(2,45,63,.18); font-weight: 700; text-decoration: none; }
         .patient-workspace-page .request-appointment-btn:hover { color: var(--teal-dark)!important; background: #eaf9fb; border-color: #eaf9fb; }
-        .staff-dashboard-page .quick-action { display: flex; align-items: center; gap: .65rem; min-height: 58px; padding: .8rem 1rem; border: 2px solid #9ecbd2; border-radius: 1rem; color: var(--teal-deep); background: #fff; box-shadow: 0 3px 8px rgba(5,73,91,.08); font-weight: 700; text-decoration: none; transition: background-color .16s ease, border-color .16s ease, transform .16s ease; }
-        .staff-dashboard-page .quick-action:hover { color: var(--teal-dark); background: #eaf9fb; border-color: var(--teal); transform: translateY(-1px); }
+        .staff-dashboard-page .quick-action, .patient-dashboard-page .quick-action { display: flex; align-items: center; gap: .65rem; min-height: 58px; padding: .8rem 1rem; border: 1px solid #9ecbd2; border-radius: .65rem; color: var(--teal-deep); background: #fff; box-shadow: 0 3px 8px rgba(5,73,91,.08); font-weight: 600; text-decoration: none; }
+        .staff-dashboard-page .quick-action:hover, .patient-dashboard-page .quick-action:hover { color: var(--teal-dark); background: #eaf9fb; border-color: var(--teal); box-shadow: 0 4px 10px rgba(5,73,91,.12); transform: translateY(-1px); }
         .staff-dashboard-page .dashboard-lists .card { overflow: hidden; }
         .patient-dashboard-page main { max-width: 1160px; padding-top: 2.35rem!important; }
         .patient-dashboard-page .patient-stat { min-height: 172px; padding: 1.55rem; border: 1px solid rgba(255,255,255,.75); border-radius: 1.25rem; background: rgba(255,255,255,.96); box-shadow: 0 8px 24px rgba(3,48,71,.1); }
@@ -103,8 +196,6 @@
         .patient-dashboard-page .patient-stat-value { margin-top: .15rem; color: var(--teal); font-size: 1.9rem; font-weight: 700; line-height: 1.15; }
         .patient-dashboard-page .quick-actions { padding: 1.5rem; border: 0; background: rgba(255,255,255,.97); }
         .patient-dashboard-page .quick-actions h2 { color: var(--teal); font-size: 1.3rem; font-weight: 700; }
-        .patient-dashboard-page .quick-action { display: flex; align-items: center; gap: .65rem; min-height: 58px; padding: .8rem 1rem; border: 1px solid #d8e5e7; border-radius: 1rem; color: var(--teal-deep); font-weight: 600; text-decoration: none; transition: background-color .16s ease, transform .16s ease; }
-        .patient-dashboard-page .quick-action:hover { background: #eefafb; transform: translateY(-1px); }
         .patient-dashboard-page .request-appointment-btn { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .6rem 1rem; border: 2px solid rgba(255,255,255,.95); border-radius: .65rem; color: var(--teal-deep)!important; background: #fff; box-shadow: 0 4px 14px rgba(2,45,63,.18); font-weight: 700; text-decoration: none; }
         .patient-dashboard-page .request-appointment-btn:hover { color: var(--teal-dark)!important; background: #eaf9fb; border-color: #eaf9fb; }
         .footer { color: #71858b; }
@@ -174,7 +265,14 @@
     @if($errors->any())<div class="alert alert-danger"><strong>Please review:</strong><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     @yield('content')
 </main>
-<footer class="footer text-center py-4 small">The Tooth Lounge · Clinic appointments and patient records</footer>
+<footer class="footer text-center py-4 small">📍 𝐓𝐇𝐄 𝐓𝐎𝐎𝐓𝐇 𝐋𝐎𝐔𝐍𝐆𝐄 <br>
+Room 211 2nd flr
+<br>La Cima  Bldg cor Duhat and Camia St
+<br>Mc Arthur Highway Matina Davao City
+<br>(On top of Swiss  Deli Restaurant)
+<br>Fronting Dunkin Donuts Matina
+<br><br>
+📲 (0945) 087 2390</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('js/clinic.js') }}" defer></script>
 @stack('scripts')

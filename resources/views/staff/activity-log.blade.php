@@ -14,8 +14,7 @@
                 <div class="col-md-2"><label class="form-label" for="from-date">From date (UTC)</label><input class="form-control" id="from-date" type="date" name="from_date" value="{{ $from }}"></div>
                 <div class="col-md-2"><label class="form-label" for="to-date">To date (UTC)</label><input class="form-control" id="to-date" type="date" name="to_date" value="{{ $to }}"></div>
                 <div class="col-md-2"><label class="form-label" for="event-filter">Activity</label><select class="form-select" id="event-filter" name="event"><option value="">All activity</option>@foreach($events as $key => $label)<option value="{{ $key }}" @selected($event === $key)>{{ $label }}</option>@endforeach</select></div>
-                <div class="col-md-2"><label class="form-label" for="user-filter">Account ID</label><input class="form-control" id="user-filter" type="number" min="1" name="user_id" value="{{ $userId }}"></div>
-                <div class="col-md-3"><label class="form-label" for="activity-search">Search activity or details</label><input class="form-control" id="activity-search" name="search" value="{{ $search }}" placeholder="e.g. appointment #12"></div>
+                <div class="col-md-4"><label class="form-label" for="activity-search">Search activity or details</label><input class="form-control" id="activity-search" name="search" value="{{ $search }}" placeholder="e.g. appointment #12"></div>
                 <div class="col-auto"><button class="btn btn-primary">Filter</button> <a class="btn btn-outline-secondary" href="{{ route('staff.activity-log') }}">Clear</a></div>
             </form>
         </div>
@@ -39,5 +38,10 @@
                 </tbody>
             </table>
         </div>
+        @if($entries->count() < $activityTotal)
+            <div class="p-3 text-center">
+                <a class="btn btn-outline-primary" href="{{ request()->fullUrlWithQuery(['activity_rows' => min($activityTotal, $activityRows + 5)]) }}">Show 5 more rows</a>
+            </div>
+        @endif
     </div>
 @endsection
